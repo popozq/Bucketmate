@@ -87,7 +87,7 @@ Beta   : 하루 50 / 월 1000 messages, maxTokens 1200
 ### 5. Agent Pack 확장
 무작정 늘리지 않는다. **추가 기준**: 사용자 명확 / 반복 업무 있음 / 결과물 구체적 / 규제 위험 낮음.
 - 후보: Content Creator, Student Study Planner, Personal Finance Organizer
-- ⚠️ 조심(초기 회피): Legal / Tax / Medical / Investment / Immigration → "전문가 대체" 아니라 "문서정리·질문준비·체크리스트"로만 제한.
+- 🚫 **제외(영구)**: Legal / Tax / Medical / Investment / Immigration / 부동산 등 규제·자문 분야는 팩으로 만들지 않는다. "정리·체크리스트로 제한"도 안 함 — 법적 리스크 원천 차단. (카탈로그·DECISIONS 참고)
 
 ### 6. (장기 비전 핵심) Custom Agent Pack Builder
 사용자가 직접 자기 목적의 Agent Pack을 조립. 처음부터 노코드 풀빌더 X, **간단한 form 기반**으로 시작.
