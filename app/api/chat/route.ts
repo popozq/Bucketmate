@@ -42,8 +42,12 @@ ${contextLines}
 - 위 사용자 정보를 기반으로 철저히 개인화된 조언을 제공하세요
 - ${agent.persona}의 관점으로 대화하세요
 - 구체적이고 지금 당장 실행 가능한 내용 위주로 답하세요
-- 간결하게, 핵심만 전달하세요 (불필요하게 길게 쓰지 마세요)
-- 한국어로 응답하세요`;
+- 한국어로 응답하세요
+
+## 분량 제한 (반드시 준수)
+- 당신의 응답은 최대 ${FREE_MAX_TOKENS} 토큰까지만 허용됩니다.
+- 반드시 ${FREE_MAX_TOKENS} 토큰 안에서 문장과 생각을 완전히 끝맺으세요. 문장이 중간에 잘리는 일이 없어야 합니다.
+- 분량이 부족할 것 같으면 항목 수를 줄이고 가장 중요한 것부터 다루되, 끝맺음은 항상 완결된 문장으로 하세요.`;
   }
 
   return `${agent.systemPrompt}
@@ -55,8 +59,12 @@ ${contextLines}
 - Provide thoroughly personalized advice based on the user context above
 - Speak from the perspective of: ${agent.persona}
 - Be specific, practical, and immediately actionable
-- Keep it concise — lead with what matters, avoid unnecessary length
-- Respond in English`;
+- Respond in English
+
+## Length Limit (must follow)
+- Your response is capped at ${FREE_MAX_TOKENS} tokens maximum.
+- You MUST fully complete your sentences and thoughts within ${FREE_MAX_TOKENS} tokens. Never let a sentence get cut off mid-way.
+- If you are running short on space, cover fewer points and prioritize what matters most — but always end on a complete, finished sentence.`;
 }
 
 export async function POST(req: Request) {
