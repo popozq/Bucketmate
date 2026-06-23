@@ -3,6 +3,7 @@ import { AgentCard } from "@/components/agent-card";
 import { getAgentPacks } from "@/data/agent-packs";
 import { Locale } from "@/types";
 import { Reveal } from "@/components/motion";
+import { TypewriterStrip } from "@/components/typewriter-strip";
 
 const copy = {
   ko: {
@@ -67,7 +68,7 @@ export function LandingPage({ locale }: { locale: Locale }) {
         </Reveal>
       </div></section>
 
-      <div className="border-y border-black/5 bg-ink py-4 text-white/55"><div className="overflow-hidden"><div className="marquee-track gap-12 px-6 text-xs font-bold uppercase tracking-[.22em]">{[0,1].map((set) => <div key={set} className="flex shrink-0 gap-12">{["EXPERT AGENTS", "TUNED PROMPTS", "PERSONALIZED ANSWERS", "HUMAN IN CONTROL", "ANY INDUSTRY"].map((item) => <span key={`${set}-${item}`} className="flex items-center gap-12">{item}<i className="h-1 w-1 rounded-full bg-brand-500" /></span>)}</div>)}</div></div></div>
+      <TypewriterStrip locale={locale} />
 
       <section id="how-it-works" className="border-b border-black/5 bg-white py-24"><div className="page-shell"><Reveal className="mx-auto max-w-2xl text-center"><p className="eyebrow">{t.howLabel}</p><h2 className="mt-4 text-4xl font-black tracking-tight">{t.howTitle}</h2><p className="mt-4 text-black/55">{t.howIntro}</p></Reveal><div className="mt-14 grid gap-5 md:grid-cols-3">{t.steps.map((step, index) => <Reveal key={step[0]} delay={index * 110}><div className="interactive-card h-full rounded-3xl border border-transparent bg-cream p-7 transition duration-500 hover:-translate-y-2 hover:border-brand-500/15 hover:bg-white hover:shadow-soft sm:p-8"><span className="text-sm font-black text-brand-600">{step[0]}</span><h3 className="mt-12 text-xl font-black">{step[1]}</h3><p className="mt-3 text-sm leading-6 text-black/55">{step[2]}</p></div></Reveal>)}</div></div></section>
       <section className="page-shell py-24"><Reveal><div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p className="eyebrow">{t.packs}</p><h2 className="mt-4 text-4xl font-black tracking-tight">{t.packsTitle}</h2></div><Link href={`${prefix}/agents`} className="font-bold text-brand-700 transition hover:translate-x-1">{t.explore} →</Link></div></Reveal><div className="mt-12 grid gap-5 lg:grid-cols-3">{agents.map((agent, index) => <Reveal key={agent.id} delay={index * 110}><AgentCard agent={agent} locale={locale} /></Reveal>)}</div></section>

@@ -122,6 +122,15 @@ body {
 
 .marquee-track { display: flex; width: max-content; animation: marquee 24s linear infinite; }
 .marquee-track:hover { animation-play-state: paused; }
+.typewriter-strip {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(88, 166, 255, .20), transparent 34%),
+    radial-gradient(circle at 82% 100%, rgba(99, 102, 241, .16), transparent 32%),
+    linear-gradient(90deg, #111d2b 0%, #172536 48%, #111d2b 100%);
+}
+.type-cursor {
+  animation: cursor-blink 850ms steps(1) infinite;
+}
 
 @keyframes gradient-shift { to { background-position: -220% center; } }
 @keyframes card-float { 0%, 100% { transform: translateY(0) rotate(-.35deg); } 50% { transform: translateY(-10px) rotate(.35deg); } }
@@ -129,6 +138,7 @@ body {
 @keyframes scan { 0%, 55% { transform: translateY(-150%); } 85%, 100% { transform: translateY(430%); } }
 @keyframes pulse-ring { 70% { box-shadow: 0 0 0 9px rgba(25, 118, 210, 0); } 100% { box-shadow: 0 0 0 0 rgba(25, 118, 210, 0); } }
 @keyframes marquee { to { transform: translateX(-50%); } }
+@keyframes cursor-blink { 50% { opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
