@@ -67,7 +67,7 @@ export function ConversationalIntake({ agent, locale = "en" }: { agent: AgentPac
           {questions.map((_, i) => (
             <span
               key={i}
-              className={`h-1.5 rounded-full transition-all ${i === step ? "w-6 bg-brand-500" : i < step ? "w-3 bg-brand-300" : "w-3 bg-black/10"}`}
+              className={`h-1.5 w-5 rounded-full transition-colors ${i === step ? "bg-brand-500" : "bg-black/15"}`}
             />
           ))}
         </div>
