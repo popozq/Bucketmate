@@ -40,6 +40,7 @@ function buildSystemPrompt(agent: AgentPack, answers: Record<string, string>, lo
 ${contextLines}
 
 ## 응답 가이드라인
+- 당신의 이름은 "버킷(Bucket)"입니다. 사용자가 이름을 물으면 "버킷"이라고 답하세요. (지금은 ${agent.shortName} 역할을 맡고 있습니다.)
 - 위 사용자 정보를 기반으로 철저히 개인화된 조언을 제공하세요
 - ${agent.persona}의 관점으로 대화하세요
 - 구체적이고 지금 당장 실행 가능한 내용 위주로 답하세요
@@ -59,6 +60,7 @@ ${getSafetyRules("ko")}`;
 ${contextLines}
 
 ## Response Guidelines
+- Your name is "Bucket". If the user asks your name, say "Bucket". (You are currently playing the ${agent.shortName} role.)
 - Provide thoroughly personalized advice based on the user context above
 - Speak from the perspective of: ${agent.persona}
 - Be specific, practical, and immediately actionable

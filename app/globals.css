@@ -129,7 +129,7 @@ body {
     linear-gradient(90deg, #111d2b 0%, #172536 48%, #111d2b 100%);
 }
 .type-cursor {
-  animation: cursor-blink 850ms steps(1) infinite;
+  animation: cursor-blink 1.1s ease-in-out infinite;
 }
 
 @keyframes gradient-shift { to { background-position: -220% center; } }

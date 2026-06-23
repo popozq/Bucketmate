@@ -92,7 +92,7 @@ export function WorkspaceDashboard({ locale = "en" }: { locale?: Locale }) {
             </span>
             <div>
               <p className="text-sm font-black">{agent?.shortName}</p>
-              <p className="text-xs text-black/40">{ko ? "AI 전문가 세션" : "Live AI session"}</p>
+              <p className="text-xs text-black/40">{ko ? `버킷 · AI 전문가 세션` : `Bucket · Live AI session`}</p>
             </div>
           </div>
           <Link
