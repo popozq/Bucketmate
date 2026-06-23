@@ -1,7 +1,7 @@
 import { createDeepSeek } from "@ai-sdk/deepseek";
 import { streamText, createDataStreamResponse, formatDataStreamPart } from "ai";
-import { getAgentPack } from "@/data/agent-packs";
-import { AgentPack } from "@/types";
+import { getLocalizedAgentPack } from "@/data/agent-packs";
+import { AgentPack, AgentQuestion, IntakeData, Locale } from "@/types";
 import { checkInput, checkOutput, getSafetyRules, getRefusal } from "@/lib/guardrails";
 
 // 무료 티어 설정 — 비용/길이 통제
@@ -28,9 +28,21 @@ const deepseek = createDeepSeek({
   },
 });
 
-function buildSystemPrompt(agent: AgentPack, answers: Record<string, string>, locale: string): string {
+// 저장된 value(코드)를 사람이 읽는 label로 되돌린다. 직접 입력값은 코드가 없으니 그대로.
+function resolveAnswer(q: AgentQuestion, raw: string | string[] | undefined): string | null {
+  if (raw === undefined || raw === "" || (Array.isArray(raw) && raw.length === 0)) return null;
+  const labelOf = (v: string) => q.options?.find((o) => o.value === v)?.label ?? v;
+  if (Array.isArray(raw)) return raw.map(labelOf).join(", ");
+  return q.type === "text" ? raw : labelOf(raw);
+}
+
+function buildSystemPrompt(agent: AgentPack, data: IntakeData, locale: string): string {
+  const safe: IntakeData = { profile: data?.profile ?? {}, context: data?.context ?? {} };
   const contextLines = agent.intakeQuestions
-    .map((q) => `- ${q.label}: ${answers[q.id] || (locale === "ko" ? "(미입력)" : "(not provided)")}`)
+    .map((q) => {
+      const raw = safe[q.scope]?.[q.field];
+      return `- ${q.label}: ${resolveAnswer(q, raw) ?? (locale === "ko" ? "(미입력)" : "(not provided)")}`;
+    })
     .join("\n");
 
   if (locale === "ko") {
@@ -85,8 +97,10 @@ ${getSafetyRules("en")}`;
 
 export async function POST(req: Request) {
   const { messages, agentId, answers, locale } = await req.json();
+  const lang: Locale = locale === "ko" ? "ko" : "en";
 
-  const agent = getAgentPack(agentId);
+  // 지역화된 팩을 쓴다 → persona·질문 라벨·옵션이 locale에 맞고, 저장된 코드를 올바른 언어로 풀어낸다.
+  const agent = getLocalizedAgentPack(agentId, lang);
   if (!agent) {
     return new Response("Agent not found", { status: 404 });
   }
@@ -103,8 +117,6 @@ export async function POST(req: Request) {
     );
   }
 
-  const lang = locale === "ko" ? "ko" : "en";
-
   // ── 입력 가드레일 ── 모델 호출 전에 마지막 사용자 메시지를 검사한다.
   // 불건전 콘텐츠 / 프롬프트 추출 시도를 모델에 닿기 전에 차단.
   const lastUserMessage = Array.isArray(messages)
@@ -115,7 +127,7 @@ export async function POST(req: Request) {
     return refusalStream(getRefusal(lang, inputCheck.reason));
   }
 
-  const system = buildSystemPrompt(agent, answers ?? {}, lang);
+  const system = buildSystemPrompt(agent, answers, lang);
 
   // 출력 누출 검사용 "보호 대상" — 튜닝 정보만(사용자 답변 제외).
   const confidential = `${agent.systemPrompt}\n${agent.persona}\n${getSafetyRules(lang)}`;

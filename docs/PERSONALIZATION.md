@@ -35,10 +35,23 @@
 - 빈 텍스트박스 5개(폼) 제거 → 버킷이 **한 번에 하나씩** 묻고 **빠른 답변 칩** 제공(탭 or 직접 입력)
 - 컴포넌트: `components/conversational-intake.tsx` (text/single/multi + allowCustom, 진행바, 이전 버튼)
 - 데이터 모델: `AgentQuestion`에 `type`/`options`/`allowCustom` 추가. 3개 팩 질문을 선택형 위주로 재설계(한·영).
-- 답변은 localStorage(`bucketmate-answers-{locale}`)에 **구조화된 세션 프로파일**로 저장 → 그대로 Phase 2 `user_profile` 스키마 초안.
-  - 예: `{ idea, target, stage, skill("기획, 디자인"), time }` (multi는 ", "로 join)
+- 답변은 localStorage(`bucketmate-answers-{locale}`)에 **구조화된 세션 프로파일**로 저장 → 그대로 Phase 2 `user_profile`/`session` 스키마 초안.
 - 검증: 데스크탑·모바일, text/single/multi/custom 전 경로 + 채팅이 답변을 정확히 반영함.
 - 효과: 진입 마찰 ↓(타이핑 5회 → 1~2회), 모바일 친화 ↑, 온브랜드("버킷과 대화").
+
+#### 데이터 모델 (2026-06-23 리팩터 — "전문화" 구조)
+- 질문(`AgentQuestion`)에 **`field`(의미 키) + `scope`('profile'|'context')** 부여. 옵션은 **`{value, label}`**(고정 코드 + 표시 라벨).
+- 저장은 `value`(코드), 화면은 `label`. → 다국어·분석·추천·로직 모두 가능. route.ts가 코드를 locale에 맞는 라벨로 풀어 AI에 전달.
+- 저장 형태(예, 비즈니스 빌더):
+  ```json
+  {
+    "profile": { "skills": ["planning","design"], "time_budget": "5_10" },
+    "context": { "idea": "...SaaS", "target_market": "creator_solo", "stage": "talked_users" }
+  }
+  ```
+  - `profile` = 그 사람(재사용·지속) → Phase 2 `user_profile`. `context` = 이번 목표 → `session`.
+  - text→string, single→value(또는 직접입력), multi→value 배열.
+- 향후: 톤 선호/성공 기준/이미 시도한 것 등 필드 추가 시 같은 패턴(value/label + scope) 유지. `time_budget` 버킷은 팩마다 약간 달라 — 진짜 재사용 강화하려면 나중에 통일 검토.
 
 > 🔒 **보안/프라이버시 메모**: Phase 1은 서버 저장이 없어 공격 표면이 작다(데이터는 브라우저 localStorage에만).
 > 단, intake 답변은 **AI 컨텍스트로 LLM 제공자(현재 DeepSeek)에 전송**된다 — 이는 프라이버시 고지 대상.

@@ -2,32 +2,36 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AgentPack, Locale } from "@/types";
+import { AgentPack, IntakeData, Locale } from "@/types";
 
 // Phase 1 대화형 인테이크 — 버킷이 한 번에 하나씩 묻고, 칩으로 빠르게 답한다.
-// 답변은 localStorage에 "세션 프로파일"로 저장(구조화). 계정/DB는 Phase 2.
+// 답변은 value(고정 코드)로 저장하고 화면엔 label을 보여준다.
+// scope에 따라 profile(지속) / context(이번 목표)로 나눠 localStorage에 저장 → Phase 2 DB 스키마 초안.
 export function ConversationalIntake({ agent, locale = "en" }: { agent: AgentPack; locale?: Locale }) {
   const router = useRouter();
   const ko = locale === "ko";
   const questions = agent.intakeQuestions;
 
   const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [data, setData] = useState<IntakeData>({ profile: {}, context: {} });
   const [text, setText] = useState(""); // text 타입 또는 직접 입력값
-  const [multi, setMulti] = useState<string[]>([]); // multi 타입 진행 중 선택
-  const [customOpen, setCustomOpen] = useState(false); // single + allowCustom 직접 입력 열림
+  const [multi, setMulti] = useState<string[]>([]); // multi 타입 진행 중 선택(value 배열)
+  const [customOpen, setCustomOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const q = questions[step];
   const isLast = step === questions.length - 1;
   const t = (k: string, e: string) => (ko ? k : e);
 
-  const commit = (value: string) => {
-    const updated = { ...answers, [q.id]: value };
-    setAnswers(updated);
+  const commit = (value: string | string[]) => {
+    const next: IntakeData = {
+      ...data,
+      [q.scope]: { ...data[q.scope], [q.field]: value },
+    };
+    setData(next);
     if (isLast) {
       setSubmitting(true);
-      window.localStorage.setItem(`bucketmate-answers-${locale}`, JSON.stringify(updated));
+      window.localStorage.setItem(`bucketmate-answers-${locale}`, JSON.stringify(next));
       window.localStorage.setItem(`bucketmate-agent-${locale}`, agent.id);
       window.setTimeout(() => router.push(`${ko ? "" : "/en"}/workspace`), 350);
       return;
@@ -46,8 +50,8 @@ export function ConversationalIntake({ agent, locale = "en" }: { agent: AgentPac
     setCustomOpen(false);
   };
 
-  const toggleMulti = (option: string) =>
-    setMulti((cur) => (cur.includes(option) ? cur.filter((o) => o !== option) : [...cur, option]));
+  const toggleMulti = (value: string) =>
+    setMulti((cur) => (cur.includes(value) ? cur.filter((v) => v !== value) : [...cur, value]));
 
   const chip = "rounded-full border px-4 py-2.5 text-sm font-bold transition";
 
@@ -118,12 +122,12 @@ export function ConversationalIntake({ agent, locale = "en" }: { agent: AgentPac
           <div className="flex flex-wrap gap-2.5">
             {q.options?.map((option) => (
               <button
-                key={option}
+                key={option.value}
                 type="button"
-                onClick={() => commit(option)}
+                onClick={() => commit(option.value)}
                 className={`${chip} border-black/10 hover:border-brand-500 hover:bg-brand-50 hover:text-brand-700`}
               >
-                {option}
+                {option.label}
               </button>
             ))}
             {q.allowCustom && !customOpen && (
@@ -163,23 +167,23 @@ export function ConversationalIntake({ agent, locale = "en" }: { agent: AgentPac
             <p className="mb-3 text-xs font-semibold text-black/40">{t("해당되는 걸 모두 선택하세요", "Select all that apply")}</p>
             <div className="flex flex-wrap gap-2.5">
               {q.options?.map((option) => {
-                const on = multi.includes(option);
+                const on = multi.includes(option.value);
                 return (
                   <button
-                    key={option}
+                    key={option.value}
                     type="button"
-                    onClick={() => toggleMulti(option)}
+                    onClick={() => toggleMulti(option.value)}
                     className={`${chip} ${on ? "border-brand-500 bg-brand-500 text-white" : "border-black/10 hover:border-brand-500 hover:text-brand-700"}`}
                   >
                     {on ? "✓ " : ""}
-                    {option}
+                    {option.label}
                   </button>
                 );
               })}
             </div>
             <button
               type="button"
-              onClick={() => commit(multi.join(", "))}
+              onClick={() => commit(multi)}
               disabled={multi.length === 0}
               className="primary-button mt-5 w-full disabled:cursor-not-allowed disabled:opacity-50"
             >
