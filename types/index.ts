@@ -1,7 +1,13 @@
+// "text" = 자유 입력, "single" = 칩 단일 선택, "multi" = 칩 다중 선택
+export type AgentQuestionType = "text" | "single" | "multi";
+
 export type AgentQuestion = {
   id: string;
   label: string;
-  placeholder: string;
+  type: AgentQuestionType;
+  placeholder?: string; // text 타입용
+  options?: string[]; // single/multi 타입용 칩 목록
+  allowCustom?: boolean; // 칩에 더해 "직접 입력"을 허용할지
 };
 
 export type AgentPack = {

@@ -31,11 +31,18 @@
 
 ## 단계 (각 단계가 그 자체로 가치 + 다음 단계로 승격됨)
 
-### Phase 1 — 대화형 인테이크 (백엔드 0, 지금 가능)
+### ✅ Phase 1 — 대화형 인테이크 (백엔드 0) — 구현 완료 (2026-06-23)
 - 빈 텍스트박스 5개(폼) 제거 → 버킷이 **한 번에 하나씩** 묻고 **빠른 답변 칩** 제공(탭 or 직접 입력)
-- "폼 다 채워야 시작" → "바로 대화 시작, 버킷이 필요한 걸 적응적으로 질문"
-- 답변은 localStorage에 **세션 프로파일**로 저장 (구조화된 형태로 — 나중에 DB 스키마로 승격)
-- 효과: 진입 마찰 ↓, 모바일 친화 ↑, 온브랜드("버킷과 대화")
+- 컴포넌트: `components/conversational-intake.tsx` (text/single/multi + allowCustom, 진행바, 이전 버튼)
+- 데이터 모델: `AgentQuestion`에 `type`/`options`/`allowCustom` 추가. 3개 팩 질문을 선택형 위주로 재설계(한·영).
+- 답변은 localStorage(`bucketmate-answers-{locale}`)에 **구조화된 세션 프로파일**로 저장 → 그대로 Phase 2 `user_profile` 스키마 초안.
+  - 예: `{ idea, target, stage, skill("기획, 디자인"), time }` (multi는 ", "로 join)
+- 검증: 데스크탑·모바일, text/single/multi/custom 전 경로 + 채팅이 답변을 정확히 반영함.
+- 효과: 진입 마찰 ↓(타이핑 5회 → 1~2회), 모바일 친화 ↑, 온브랜드("버킷과 대화").
+
+> 🔒 **보안/프라이버시 메모**: Phase 1은 서버 저장이 없어 공격 표면이 작다(데이터는 브라우저 localStorage에만).
+> 단, intake 답변은 **AI 컨텍스트로 LLM 제공자(현재 DeepSeek)에 전송**된다 — 이는 프라이버시 고지 대상.
+> 민감정보(실명/연락처/결제 등)는 intake에서 받지 않는다. 진짜 보안 작업(암호화·RLS·인증·PII)은 Phase 2(계정/DB)에서.
 
 ### Phase 2 — 계정 + 지속 유저 프로파일 (= ROADMAP 1순위 "계정/저장")
 - 인증 + DB. 대화형 인테이크가 **유저 프로파일에 기록**됨

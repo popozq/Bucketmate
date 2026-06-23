@@ -1,7 +1,7 @@
 import { Locale } from "@/types";
 
 export function StepStrip({ active, locale = "en" }: { active: 1 | 2 | 3; locale?: Locale }) {
-  const steps = locale === "ko" ? ["팩 선택", "목표 알려주기", "실행 계획 받기"] : ["Choose a pack", "Tell us your goal", "Get your plan"];
+  const steps = locale === "ko" ? ["팩 선택", "상황 알려주기", "버킷과 대화"] : ["Choose a pack", "Share your context", "Chat with Bucket"];
   return (
     <div className="flex items-center justify-center gap-2 sm:gap-4">
       {steps.map((step, index) => {
