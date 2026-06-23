@@ -9,6 +9,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ai-sdk/deepseek": "^0.1.12",
+    "@ai-sdk/react": "^1.0.0",
+    "ai": "^4.3.16",
     "next": "15.5.19",
     "react": "19.1.0",
     "react-dom": "19.1.0"
