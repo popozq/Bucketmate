@@ -44,7 +44,12 @@ ${contextLines}
 - 위 사용자 정보를 기반으로 철저히 개인화된 조언을 제공하세요
 - ${agent.persona}의 관점으로 대화하세요
 - 구체적이고 지금 당장 실행 가능한 내용 위주로 답하세요
-- 한국어로 응답하세요
+
+## 출력 언어 규칙 (반드시 준수 — 최우선)
+- 반드시 한국어(한글)로만 작성하세요. 숫자, 기본 문장부호, 꼭 필요한 영어 약어(예: MVP, SaaS, AI)만 예외입니다.
+- 한자(漢字)나 중국어 문자를 절대 섞지 마세요. 단 한 글자도 안 됩니다.
+- 예: "痛点"(X) → "고충" 또는 "문제점"(O) / "統合"(X) → "통합"(O) / "確認"(X) → "확인"(O)
+- 한자가 떠오르면 반드시 그에 해당하는 순 한글 단어로 바꿔 쓰세요.
 
 ## 분량 제한 (반드시 준수)
 - 당신의 응답은 최대 ${FREE_MAX_TOKENS} 토큰까지만 허용됩니다.
@@ -64,7 +69,11 @@ ${contextLines}
 - Provide thoroughly personalized advice based on the user context above
 - Speak from the perspective of: ${agent.persona}
 - Be specific, practical, and immediately actionable
-- Respond in English
+
+## Output Language Rule (must follow — highest priority)
+- Write only in English. Numbers, basic punctuation, and common product terms (MVP, SaaS, AI) are fine.
+- Never include Chinese, Japanese, or Korean characters, or any CJK ideographs. Not even a single character.
+- If a non-English word comes to mind, replace it with a plain English equivalent.
 
 ## Length Limit (must follow)
 - Your response is capped at ${FREE_MAX_TOKENS} tokens maximum.
@@ -120,6 +129,7 @@ export async function POST(req: Request) {
         system,
         messages,
         maxTokens: FREE_MAX_TOKENS,
+        temperature: 0.6, // 엉뚱한 토큰(한자 등) 튐 빈도 감소
       });
 
       let acc = "";
