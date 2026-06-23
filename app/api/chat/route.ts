@@ -1,7 +1,8 @@
 import { createDeepSeek } from "@ai-sdk/deepseek";
-import { streamText } from "ai";
+import { streamText, createDataStreamResponse, formatDataStreamPart } from "ai";
 import { getAgentPack } from "@/data/agent-packs";
 import { AgentPack } from "@/types";
+import { checkInput, checkOutput, getSafetyRules, getRefusal } from "@/lib/guardrails";
 
 // 무료 티어 설정 — 비용/길이 통제
 const FREE_MODEL = "deepseek-v4-flash"; // deepseek-chat은 2026/07/24 deprecated
@@ -47,7 +48,9 @@ ${contextLines}
 ## 분량 제한 (반드시 준수)
 - 당신의 응답은 최대 ${FREE_MAX_TOKENS} 토큰까지만 허용됩니다.
 - 반드시 ${FREE_MAX_TOKENS} 토큰 안에서 문장과 생각을 완전히 끝맺으세요. 문장이 중간에 잘리는 일이 없어야 합니다.
-- 분량이 부족할 것 같으면 항목 수를 줄이고 가장 중요한 것부터 다루되, 끝맺음은 항상 완결된 문장으로 하세요.`;
+- 분량이 부족할 것 같으면 항목 수를 줄이고 가장 중요한 것부터 다루되, 끝맺음은 항상 완결된 문장으로 하세요.
+
+${getSafetyRules("ko")}`;
   }
 
   return `${agent.systemPrompt}
@@ -64,7 +67,9 @@ ${contextLines}
 ## Length Limit (must follow)
 - Your response is capped at ${FREE_MAX_TOKENS} tokens maximum.
 - You MUST fully complete your sentences and thoughts within ${FREE_MAX_TOKENS} tokens. Never let a sentence get cut off mid-way.
-- If you are running short on space, cover fewer points and prioritize what matters most — but always end on a complete, finished sentence.`;
+- If you are running short on space, cover fewer points and prioritize what matters most — but always end on a complete, finished sentence.
+
+${getSafetyRules("en")}`;
 }
 
 export async function POST(req: Request) {
@@ -87,14 +92,53 @@ export async function POST(req: Request) {
     );
   }
 
-  const system = buildSystemPrompt(agent, answers ?? {}, locale ?? "en");
+  const lang = locale === "ko" ? "ko" : "en";
 
-  const result = streamText({
-    model: deepseek(FREE_MODEL),
-    system,
-    messages,
-    maxTokens: FREE_MAX_TOKENS,
+  // ── 입력 가드레일 ── 모델 호출 전에 마지막 사용자 메시지를 검사한다.
+  // 불건전 콘텐츠 / 프롬프트 추출 시도를 모델에 닿기 전에 차단.
+  const lastUserMessage = Array.isArray(messages)
+    ? [...messages].reverse().find((m: { role: string }) => m.role === "user")
+    : undefined;
+  const inputCheck = checkInput(lastUserMessage?.content ?? "");
+  if (!inputCheck.ok) {
+    return refusalStream(getRefusal(lang, inputCheck.reason));
+  }
+
+  const system = buildSystemPrompt(agent, answers ?? {}, lang);
+
+  // 출력 누출 검사용 "보호 대상" — 튜닝 정보만(사용자 답변 제외).
+  const confidential = `${agent.systemPrompt}\n${agent.persona}\n${getSafetyRules(lang)}`;
+
+  // ── 출력 가드레일 ── 스트리밍하면서 누적 텍스트를 검사한다.
+  // 프롬프트 누출 / 불건전 콘텐츠가 감지되면 즉시 중단하고 거절 메시지로 대체.
+  return createDataStreamResponse({
+    execute: async (writer) => {
+      const result = streamText({
+        model: deepseek(FREE_MODEL),
+        system,
+        messages,
+        maxTokens: FREE_MAX_TOKENS,
+      });
+
+      let acc = "";
+      for await (const chunk of result.textStream) {
+        acc += chunk;
+        const outCheck = checkOutput(acc, confidential);
+        if (!outCheck.ok) {
+          writer.write(formatDataStreamPart("text", "\n\n" + getRefusal(lang, outCheck.reason)));
+          return;
+        }
+        writer.write(formatDataStreamPart("text", chunk));
+      }
+    },
   });
+}
 
-  return result.toDataStreamResponse();
+// 모델을 거치지 않고 정중한 거절 메시지를 스트림 형식으로 반환.
+function refusalStream(message: string): Response {
+  return createDataStreamResponse({
+    execute: (writer) => {
+      writer.write(formatDataStreamPart("text", message));
+    },
+  });
 }

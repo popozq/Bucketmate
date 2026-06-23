@@ -54,6 +54,11 @@ Free   : 하루 20 / 월 300 messages, maxTokens 800
 Beta   : 하루 50 / 월 1000 messages, maxTokens 1200
 ```
 
+> ✅ 베이스라인 가드레일은 v0.1에 이미 들어감(`lib/guardrails.ts`: 콘텐츠 차단 + 프롬프트 유출 방지). 아래는 고도화.
+- [ ] 욕설/성적 키워드 목록 보강 (오탐 모니터링하며)
+- [ ] LLM 기반 moderation으로 업그레이드 (트래픽·예산 생기면)
+- [ ] 출력 하드블록 시 부분노출(스트리밍 중 몇 글자) 최소화
+
 ### 2. Business Builder Pack 깊게 만들기 (Pack 늘리기보다 우선)
 가장 검증 쉬운 Pack 하나를 제대로. (BucketMate 만들면서 직접 테스트 가능, 규제 위험 낮음)
 - [ ] intake 질문 다듬기 / 시스템 프롬프트 튜닝 고도화
