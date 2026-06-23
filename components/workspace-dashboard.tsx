@@ -8,7 +8,8 @@ import { Locale } from "@/types";
 
 export function WorkspaceDashboard({ locale = "en" }: { locale?: Locale }) {
   const [agentId, setAgentId] = useState<string | null>(null);
-  const [answers, setAnswers] = useState<Record<string, string> | null>(null);
+  const [answers, setAnswers] = useState<Record<string, unknown> | null>(null);
+  const [goal, setGoal] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const triggered = useRef(false);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -16,27 +17,41 @@ export function WorkspaceDashboard({ locale = "en" }: { locale?: Locale }) {
   const ko = locale === "ko";
 
   useEffect(() => {
-    const savedAnswers = window.localStorage.getItem(`bucketmate-answers-${locale}`);
-    const savedAgent = window.localStorage.getItem(`bucketmate-agent-${locale}`);
-    if (savedAnswers) setAnswers(JSON.parse(savedAnswers));
-    if (savedAgent) setAgentId(savedAgent);
+    // 동적 역할 모드(goal) 우선, 없으면 레거시 팩 모드(agent+answers)
+    const savedGoal = window.localStorage.getItem(`bucketmate-goal-${locale}`);
+    if (savedGoal) {
+      setGoal(savedGoal);
+    } else {
+      const savedAnswers = window.localStorage.getItem(`bucketmate-answers-${locale}`);
+      const savedAgent = window.localStorage.getItem(`bucketmate-agent-${locale}`);
+      if (savedAnswers) setAnswers(JSON.parse(savedAnswers));
+      if (savedAgent) setAgentId(savedAgent);
+    }
     setReady(true);
   }, [locale]);
 
   const agent = agentId ? getLocalizedAgentPack(agentId, locale) : undefined;
+  const dynamic = !!goal;
+  const hasSession = dynamic || (!!agentId && !!answers);
 
   const MAX_MESSAGES = 20; // route.ts의 MAX_MESSAGES_PER_SESSION과 일치
 
   const { messages, input, handleInputChange, handleSubmit, isLoading, append, error } = useChat({
     api: "/api/chat",
-    body: { agentId, answers, locale },
+    body: { agentId, answers, goal, locale },
   });
 
   const limitReached = messages.length >= MAX_MESSAGES;
 
-  // 첫 AI 메시지 자동 트리거
+  // 첫 메시지 자동 트리거
   useEffect(() => {
-    if (ready && agentId && answers && !triggered.current) {
+    if (!ready || triggered.current) return;
+    if (dynamic) {
+      // 동적 모드: 사용자가 입력한 목표가 곧 첫 메시지
+      triggered.current = true;
+      append({ role: "user", content: goal! });
+    } else if (agentId && answers) {
+      // 팩 모드: 일반 인사로 시작
       triggered.current = true;
       append({
         role: "user",
@@ -45,7 +60,7 @@ export function WorkspaceDashboard({ locale = "en" }: { locale?: Locale }) {
           : "Hello! Please review my situation and share your initial assessment — what should I focus on first?",
       });
     }
-  }, [ready, agentId, answers]);
+  }, [ready, dynamic, goal, agentId, answers]);
 
   // 새 메시지마다 하단 스크롤
   useEffect(() => {
@@ -60,21 +75,21 @@ export function WorkspaceDashboard({ locale = "en" }: { locale?: Locale }) {
     );
   }
 
-  if (!agentId || !answers) {
+  if (!hasSession) {
     return (
       <main className="page-shell py-24">
         <div className="card mx-auto max-w-2xl p-10 text-center sm:p-16">
           <span className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-brand-100 text-2xl">◎</span>
           <h1 className="mt-6 text-3xl font-black">
-            {ko ? "새로운 목표를 시작할 준비가 됐어요." : "Your workspace is ready for a goal."}
+            {ko ? "버킷과 대화를 시작해 보세요." : "Start a conversation with Bucket."}
           </h1>
           <p className="mt-4 leading-7 text-black/50">
             {ko
-              ? "에이전트 팩을 고르고 질문에 답하면 AI와 대화를 시작할 수 있어요."
-              : "Choose an Agent Pack and answer the intake questions to start your AI session."}
+              ? "무엇을 도와드릴지 한 줄로 알려주시면, 버킷이 딱 맞는 전문가가 되어 대화를 시작해요."
+              : "Tell Bucket what you need in one line, and it becomes the right expert to help."}
           </p>
           <Link href={`${prefix}/agents`} className="primary-button mt-8">
-            {ko ? "에이전트 팩 선택하기" : "Choose an Agent Pack"} →
+            {ko ? "버킷에게 말 걸기" : "Talk to Bucket"} →
           </Link>
         </div>
       </main>
@@ -91,8 +106,12 @@ export function WorkspaceDashboard({ locale = "en" }: { locale?: Locale }) {
               {agent?.icon ?? "B"}
             </span>
             <div>
-              <p className="text-sm font-black">{agent?.shortName}</p>
-              <p className="text-xs text-black/40">{ko ? `버킷 · AI 전문가 세션` : `Bucket · Live AI session`}</p>
+              <p className="text-sm font-black">{agent?.shortName ?? (ko ? "버킷" : "Bucket")}</p>
+              <p className="text-xs text-black/40">
+                {agent
+                  ? (ko ? "버킷 · AI 전문가 세션" : "Bucket · Live AI session")
+                  : (ko ? "AI 전문가 세션" : "Live AI session")}
+              </p>
             </div>
           </div>
           <Link

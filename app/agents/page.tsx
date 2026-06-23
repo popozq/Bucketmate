@@ -1,2 +1,2 @@
-import { AgentsPageView } from "@/components/agents-page-view";
-export default function AgentsPage() { return <AgentsPageView locale="ko" />; }
+import { StartComposer } from "@/components/start-composer";
+export default function StartPage() { return <StartComposer locale="ko" />; }
