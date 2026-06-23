@@ -1,22 +1,37 @@
 # BucketMate v0.1
 
-Mocked frontend MVP for an AI Agent Pack platform and goal execution manager.
+사용자가 원하는 전문가 역할(Agent Pack)을 골라, 개인 맥락에 맞춰 튜닝된 AI와 대화하는
+AI Agent 플랫폼.
 
-## Run locally
+## 로컬 실행
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
-Open `http://localhost:3000`.
+`.env.local`에 DeepSeek API 키 필요 (양식은 `.env.example` 참고):
 
-## MVP flow
+```
+DEEPSEEK_API_KEY=sk-...
+```
 
-1. Visit the landing page.
-2. Choose one of three hardcoded Agent Packs.
-3. Complete the pack-specific intake form.
-4. Receive a mocked 7-day execution plan.
-5. Check off tasks; progress persists in local storage.
+`http://localhost:3000` 접속.
 
-Supabase, authentication, and real AI generation are intentionally not included in v0.1.
+## 흐름
+
+1. 랜딩 페이지 (한국어 `/`, 영어 `/en`)
+2. Agent Pack 선택 (Business Builder / Restaurant Operator / Career Helper)
+3. 팩별 intake 질문에 답변
+4. intake 답변으로 개인화된 시스템 프롬프트가 조립되어 **AI 채팅 세션** 시작
+
+## 기술 스택
+
+Next.js 15 · React 19 · TypeScript · Tailwind CSS · Vercel AI SDK (DeepSeek)
+
+## 문서
+
+- [docs/DECISIONS.md](docs/DECISIONS.md) — 주요 의사결정과 "왜"
+- [docs/ROADMAP.md](docs/ROADMAP.md) — 다음 할 일
+
+계정/인증/DB는 아직 없음 (intake·대화는 localStorage). 로드맵 참고.
