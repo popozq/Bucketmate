@@ -112,7 +112,7 @@ export function GoalInput({ locale = "en", autoFocus = false, showChips = true }
     <div className="w-full">
       <form
         onSubmit={submit}
-        className="rounded-3xl border border-black/10 bg-white p-3 shadow-soft transition duration-300 focus-within:border-brand-400 focus-within:ring-[5px] focus-within:ring-brand-400/25 dark:border-white/15 dark:bg-white/10 dark:shadow-[0_24px_70px_rgba(5,12,25,.45)] dark:backdrop-blur-xl dark:focus-within:border-brand-300/70 dark:focus-within:ring-brand-300/25 sm:p-4"
+        className="input-aura rounded-3xl border border-black/10 bg-white p-3 shadow-soft transition-colors duration-300 focus-within:border-brand-400 dark:border-white/15 dark:bg-white/10 dark:shadow-[0_24px_70px_rgba(5,12,25,.45)] dark:backdrop-blur-xl dark:focus-within:border-brand-300/70 sm:p-4"
       >
         <div className="flex items-start gap-3">
           <span className="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-100 text-sm font-black text-brand-700">B</span>
