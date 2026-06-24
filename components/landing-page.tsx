@@ -44,7 +44,12 @@ export function LandingPage({ locale }: { locale: Locale }) {
       {/* 히어로 — 진입점(입력창)을 바로 위에 */}
       <section className="relative">
         <div className="tech-grid absolute inset-0 -z-20 opacity-60" />
-        <div className="page-shell flex min-h-[620px] flex-col items-center justify-center py-20 text-center lg:py-28">
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <div className="aurora aurora-1 left-[20%] top-[26%] h-72 w-72 sm:h-96 sm:w-96" />
+          <div className="aurora aurora-2 right-[16%] top-[18%] h-64 w-64 sm:h-80 sm:w-80" />
+          <div className="aurora aurora-3 left-[44%] top-[50%] h-56 w-56 sm:h-72 sm:w-72" />
+        </div>
+        <div className="page-shell relative flex min-h-[620px] flex-col items-center justify-center py-20 text-center lg:py-28">
           <Reveal>
             <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-brand-500/20 bg-white/70 px-4 py-2 text-xs font-bold text-brand-700 shadow-sm backdrop-blur">
               <span className="live-dot h-2 w-2 rounded-full bg-brand-500" />
