@@ -41,31 +41,35 @@ export function LandingPage({ locale }: { locale: Locale }) {
   const t = copy[locale];
   return (
     <main className="overflow-hidden">
-      {/* 히어로 — 진입점(입력창)을 바로 위에 */}
-      <section className="relative">
-        <div className="tech-grid absolute inset-0 -z-20 opacity-60" />
-        <div className="page-shell flex min-h-[620px] flex-col items-center justify-center py-20 text-center lg:py-28">
+      {/* 히어로 — 테마 반응형. 다크모드에선 미디어-레디 어두운 톤(나중에 영상 슬롯). */}
+      <section className="hero-bg relative">
+        {/* 배경 영상 슬롯(다크): 나중에 여기에 <video> + 스크림을 넣으면 됨. 지금은 오로라. */}
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <div className="aurora aurora-1 left-[20%] top-[26%] h-72 w-72 sm:h-96 sm:w-96" />
+          <div className="aurora aurora-2 right-[16%] top-[18%] h-64 w-64 sm:h-80 sm:w-80" />
+          <div className="aurora aurora-3 left-[44%] top-[50%] h-56 w-56 sm:h-72 sm:w-72" />
+        </div>
+        <div className="page-shell relative flex min-h-[640px] flex-col items-center justify-center py-20 text-center lg:py-28">
           <Reveal>
-            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-brand-500/20 bg-white/70 px-4 py-2 text-xs font-bold text-brand-700 shadow-sm backdrop-blur">
-              <span className="live-dot h-2 w-2 rounded-full bg-brand-500" />
+            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-brand-500/20 bg-white/70 px-4 py-2 text-xs font-bold text-brand-700 shadow-sm backdrop-blur dark:border-white/15 dark:bg-white/10 dark:text-white/80">
+              <span className="live-dot h-2 w-2 rounded-full bg-brand-500 dark:bg-brand-400" />
               {t.badge}
             </div>
             <h1 className="mx-auto max-w-3xl select-none text-5xl font-black leading-[1.1] tracking-[-0.04em] sm:text-6xl lg:text-7xl">
               <span className="block gradient-text">{t.line1}</span>
-              <span className="mt-1.5 block text-ink">{t.line2}</span>
+              <span className="mt-1.5 block text-ink dark:text-white">{t.line2}</span>
             </h1>
-            <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-black/55">{t.intro}</p>
+            <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-black/55 dark:text-white/65">{t.intro}</p>
           </Reveal>
 
           <Reveal delay={140} className="mt-10 w-full">
             <div className="relative mx-auto max-w-2xl">
-              <div className="absolute -inset-8 -z-10 rounded-[40px] bg-brand-100/60 blur-3xl" />
               <GoalInput locale={locale} />
             </div>
           </Reveal>
 
           <Reveal delay={220}>
-            <div className="mt-9 flex flex-wrap justify-center gap-x-7 gap-y-3 text-sm font-semibold text-black/45">
+            <div className="mt-9 flex flex-wrap justify-center gap-x-7 gap-y-3 text-sm font-semibold text-black/45 dark:text-white/55">
               {t.points.map((point) => <span key={point}>✓ {point}</span>)}
             </div>
           </Reveal>
