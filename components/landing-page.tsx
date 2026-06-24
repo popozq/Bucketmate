@@ -5,8 +5,8 @@ import { Reveal } from "@/components/motion";
 const copy = {
   ko: {
     badge: "BucketMate v0.1 · 한국어 베타",
-    title: "무엇이든 말해보세요,",
-    highlight: "버킷이 전문가가 되어 도와줘요.",
+    line1: "버킷메이트",
+    line2: "당신만의 맞춤형 AI",
     intro: "팩을 고르거나 폼을 채울 필요 없어요. 하고 싶은 일을 한 줄로 적으면, 버킷이 가장 알맞은 전문가가 되어 바로 대화를 시작합니다.",
     points: ["약 10초면 시작", "가입 없이 체험 가능", "내 상황에 맞춘 답변"],
     howLabel: "이용 방법",
@@ -21,8 +21,8 @@ const copy = {
   },
   en: {
     badge: "BucketMate v0.1",
-    title: "Just say it,",
-    highlight: "Bucket becomes the expert.",
+    line1: "BucketMate",
+    line2: "Your own personalized AI",
     intro: "No packs to pick, no forms to fill. Write what you need in one line and Bucket becomes the right expert and starts the conversation.",
     points: ["Start in ~10 seconds", "No account needed", "Answers tuned to you"],
     howLabel: "How it works",
@@ -50,8 +50,9 @@ export function LandingPage({ locale }: { locale: Locale }) {
               <span className="live-dot h-2 w-2 rounded-full bg-brand-500" />
               {t.badge}
             </div>
-            <h1 className="mx-auto max-w-3xl text-4xl font-black leading-[1.12] tracking-[-0.04em] sm:text-5xl lg:text-6xl">
-              {t.title} <span className="gradient-text">{t.highlight}</span>
+            <h1 className="mx-auto max-w-3xl select-none text-5xl font-black leading-[1.1] tracking-[-0.04em] sm:text-6xl lg:text-7xl">
+              <span className="block gradient-text">{t.line1}</span>
+              <span className="mt-1.5 block text-ink">{t.line2}</span>
             </h1>
             <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-black/55">{t.intro}</p>
           </Reveal>
