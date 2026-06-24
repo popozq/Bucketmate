@@ -23,11 +23,13 @@ const presets = {
   ],
 };
 
-// placeholder가 타자기처럼 한 글자씩 타이핑되며 예시를 보여준다.
+// ▼▼▼ 타자기 placeholder 문구 — 여기서 자유롭게 추가/수정/삭제하세요 ▼▼▼
+// ko = 한국어 화면, en = 영어 화면. 원하는 만큼 줄을 늘리거나 줄여도 됩니다.
 const typed = {
   ko: ["무엇을 도와드릴까요?", "사업 아이디어를 구체화하고 싶어요", "이력서를 다듬고 싶어요", "동네 가게를 홍보하고 싶어요", "공부 계획을 세우고 싶어요"],
   en: ["What can I help with?", "I want to shape a business idea", "I want to polish my resume", "I want to promote my local shop", "I want to plan my studies"],
 };
+// ▲▲▲ 타자기 placeholder 문구 끝 ▲▲▲
 
 const copy = {
   ko: { start: "버킷과 대화 시작", starting: "버킷을 준비하고 있어요...", examples: "이렇게 시작해도 돼요" },
@@ -61,7 +63,7 @@ function useTypewriter(items: string[]) {
     const current = items[idx];
     const doneTyping = !deleting && text === current;
     const doneDeleting = deleting && text === "";
-    const delay = doneTyping ? 2200 : doneDeleting ? 500 : deleting ? 38 : 85; // 느긋한 속도
+    const delay = doneTyping ? 4000 : doneDeleting ? 500 : deleting ? 38 : 85; // 다 친 뒤 4초 멈춤
 
     const t = window.setTimeout(() => {
       if (doneTyping) return setDeleting(true);
