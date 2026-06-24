@@ -8,11 +8,11 @@ import { Locale } from "@/types";
 // 테마(라이트·다크)에 맞춰 스타일이 바뀌고, placeholder는 타자기처럼 타이핑된다.
 const presets = {
   ko: [
-    "사업 아이디어를 구체화하고 싶어요",
-    "이력서와 구직을 준비하고 있어요",
-    "가게 운영을 개선하고 싶어요",
-    "SNS·마케팅 계획이 필요해요",
-    "공부·시험 계획을 세우고 싶어요",
+    "사업 아이디어를 구체화하고 싶어요.",
+    "이력서와 구직을 준비하고 있어요.",
+    "가게 운영을 개선하고 싶어요.",
+    "SNS·마케팅 계획이 필요해요.",
+    "공부·시험 계획을 세우고 싶어요.",
   ],
   en: [
     "I want to shape a business idea",
@@ -26,7 +26,7 @@ const presets = {
 // ▼▼▼ 타자기 placeholder 문구 — 여기서 자유롭게 추가/수정/삭제하세요 ▼▼▼
 // ko = 한국어 화면, en = 영어 화면. 원하는 만큼 줄을 늘리거나 줄여도 됩니다.
 const typed = {
-  ko: ["무엇을 도와드릴까요?", "사업 아이디어를 구체화하고 싶어요", "이력서를 다듬고 싶어요", "동네 가게를 홍보하고 싶어요", "공부 계획을 세우고 싶어요"],
+  ko: ["안녕하세요, AI버킷이에요.", "무엇을 도와드릴까요?", "사업 아이디어를 구체화하고 싶어.", "이력서를 다듬고 싶어.", "동네 가게를 홍보하고 싶어.", "공부 계획을 세우고 싶어."],
   en: ["What can I help with?", "I want to shape a business idea", "I want to polish my resume", "I want to promote my local shop", "I want to plan my studies"],
 };
 // ▲▲▲ 타자기 placeholder 문구 끝 ▲▲▲
@@ -49,13 +49,14 @@ function usePrefersReducedMotion() {
 }
 
 // 타자기 placeholder — 타이핑 → 잠시 멈춤 → 지움 → 다음 문장
-function useTypewriter(items: string[]) {
+function useTypewriter(items: string[], paused = false) {
   const reduced = usePrefersReducedMotion();
   const [text, setText] = useState("");
   const [idx, setIdx] = useState(0);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
+    if (paused) return; // 입력창 사용 중(focus)엔 멈춤
     if (reduced) {
       setText(items[0]);
       return;
@@ -75,7 +76,7 @@ function useTypewriter(items: string[]) {
       setText((v) => (deleting ? current.slice(0, v.length - 1) : current.slice(0, v.length + 1)));
     }, delay);
     return () => window.clearTimeout(t);
-  }, [reduced, deleting, idx, text, items]);
+  }, [paused, reduced, deleting, idx, text, items]);
 
   // 깜빡이는 커서 흉내 (타이핑 중엔 항상, 멈춤 중엔 placeholder라 큰 의미는 없음)
   return text + "▌";
@@ -87,7 +88,10 @@ export function GoalInput({ locale = "en", autoFocus = false, showChips = true }
   const c = copy[locale];
   const [goal, setGoal] = useState("");
   const [starting, setStarting] = useState(false);
-  const placeholder = useTypewriter(typed[locale]);
+  const [focused, setFocused] = useState(false);
+  // 커서가 입력창에 올라가면(focus) 타자기를 멈추고 placeholder를 비운다.
+  const typewriter = useTypewriter(typed[locale], focused);
+  const placeholder = focused ? "" : typewriter;
 
   const start = (text: string) => {
     const g = text.trim();
@@ -108,7 +112,7 @@ export function GoalInput({ locale = "en", autoFocus = false, showChips = true }
     <div className="w-full">
       <form
         onSubmit={submit}
-        className="rounded-3xl border border-black/10 bg-white p-3 shadow-soft transition focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-100 dark:border-white/15 dark:bg-white/10 dark:shadow-[0_24px_70px_rgba(5,12,25,.45)] dark:backdrop-blur-xl dark:focus-within:border-brand-300/60 dark:focus-within:ring-brand-400/20 sm:p-4"
+        className="rounded-3xl border border-black/10 bg-white p-3 shadow-soft transition duration-300 focus-within:border-brand-400 focus-within:ring-[5px] focus-within:ring-brand-400/25 dark:border-white/15 dark:bg-white/10 dark:shadow-[0_24px_70px_rgba(5,12,25,.45)] dark:backdrop-blur-xl dark:focus-within:border-brand-300/70 dark:focus-within:ring-brand-300/25 sm:p-4"
       >
         <div className="flex items-start gap-3">
           <span className="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-100 text-sm font-black text-brand-700">B</span>
@@ -117,6 +121,8 @@ export function GoalInput({ locale = "en", autoFocus = false, showChips = true }
             rows={2}
             value={goal}
             onChange={(e) => setGoal(e.target.value)}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
