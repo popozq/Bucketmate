@@ -143,11 +143,20 @@ html.dark .hero-bg { background: radial-gradient(120% 90% at 50% 22%, #18283f 0%
 .aurora-3 { background: rgba(45, 212, 191, .4); animation: aurora-3 22s ease-in-out infinite; }
 html.dark .aurora { opacity: .62; }
 
-/* 입력창 포커스 글로우 — 오로라처럼 은은하게 켜졌다 꺼졌다 호흡 */
-.input-aura:focus-within { animation: input-glow 3s ease-in-out infinite; }
+/* 입력창 포커스 글로우 — 오로라처럼 켜졌다 꺼졌다 호흡 (블루+바이올렛). 라이트/다크 따로 튜닝 */
+.input-aura:focus-within { animation: input-glow 2.8s ease-in-out infinite; }
+html.dark .input-aura:focus-within { animation: input-glow-dark 2.8s ease-in-out infinite; }
+
+/* 라이트모드 — 밝은 배경에서도 또렷하게: 진한 브랜드 블루 + 바이올렛, 넓은 펄스 */
 @keyframes input-glow {
-  0%, 100% { box-shadow: 0 0 0 2px rgba(96, 165, 250, .10), 0 0 16px rgba(96, 165, 250, .10); }
-  50%      { box-shadow: 0 0 0 5px rgba(96, 165, 250, .22), 0 0 42px rgba(96, 165, 250, .34); }
+  0%, 100% { box-shadow: 0 0 0 2px rgba(59, 130, 246, .20), 0 0 22px rgba(59, 130, 246, .20); }
+  50%      { box-shadow: 0 0 0 6px rgba(59, 130, 246, .40), 0 8px 58px rgba(59, 130, 246, .50), 0 0 48px rgba(139, 92, 246, .38); }
+}
+
+/* 다크모드 — 더 밝은 블루로 */
+@keyframes input-glow-dark {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(96, 165, 250, .14), 0 0 22px rgba(96, 165, 250, .18); }
+  50%      { box-shadow: 0 0 0 6px rgba(96, 165, 250, .34), 0 8px 58px rgba(96, 165, 250, .48), 0 0 48px rgba(167, 139, 250, .34); }
 }
 
 @keyframes aurora-1 { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(36px, -28px, 0) scale(1.18); } }
